@@ -7,6 +7,8 @@ from app.routers import vendors
 from fastapi.requests import Request
 from confluent_kafka import Producer
 from app.database import Base, engine
+import datetime
+import pytz
 
 #If we don't import this FastAPI will not create a table
 from app.models import Vendor 
@@ -31,7 +33,8 @@ app.include_router(vendors.router)
 # CORS origins
 ORIGINS = [
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "http://139.59.87.2:3000"
     # Add other origins as needed
 ]
 
@@ -49,22 +52,28 @@ app.add_middleware(
 async def log_request_data(request: Request, call_next):
     # Extract request metadata
     client_host = request.client.host
-    method = request.method
+    http_method = request.method
     url = request.url.path
     headers = dict(request.headers)
 
+    # Convert timestamp to IST
+    ist_timezone = pytz.timezone("Asia/Kolkata")
+    event_time = datetime.datetime.now(ist_timezone).isoformat()
+
     # Log the request metadata
     print(f"Client Host: {client_host}")
-    print(f"Method: {method}")
+    print(f"Method: {http_method}")
     print(f"URL: {url}")
     print(f"Headers: {headers}")
+    print(f"Event Time: {event_time}")
     # Process the request and get the response
 
     event_message = {
         "client_host": client_host,
-        "method": method,
+        "http_method": http_method,
         "url": url,
-        "headers": headers
+        #"headers": headers,
+        #"event_time": event_time
     }
 
     # Convert the event message to a JSON string

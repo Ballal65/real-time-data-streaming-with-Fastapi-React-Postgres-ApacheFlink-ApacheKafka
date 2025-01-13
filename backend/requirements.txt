@@ -2,3 +2,5 @@ fastapi[standard]
 sqlalchemy
 psycopg2
 confluent-kafka
+requests
+pytz
