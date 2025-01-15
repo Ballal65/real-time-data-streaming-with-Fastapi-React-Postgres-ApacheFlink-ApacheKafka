@@ -73,7 +73,7 @@ async def log_request_data(request: Request, call_next):
         "http_method": http_method,
         "url": url,
         #"headers": headers,
-        #"event_time": event_time
+        "event_time": event_time
     }
 
     # Convert the event message to a JSON string

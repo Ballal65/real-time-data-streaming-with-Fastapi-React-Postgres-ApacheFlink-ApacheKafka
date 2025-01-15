@@ -35,7 +35,8 @@ def create_events_source_kafka(t_env):
         CREATE TABLE {table_name} (
             client_host VARCHAR,
             http_method VARCHAR,
-            url VARCHAR
+            url VARCHAR,
+            event_time STRING
         ) WITH (
             'connector' = 'kafka',
             'properties.bootstrap.servers' = '{os.environ.get('KAFKA_BROKER')}',
@@ -45,17 +46,18 @@ def create_events_source_kafka(t_env):
             'format' = 'json'
         );
     """
+    print(f"Kafka Source DDL: \n{source_ddl}")
     t_env.execute_sql(source_ddl)
     return table_name
 
-
 def create_processed_events_sink_postgres(t_env):
-    table_name = 'user_logs'
+    table_name = 'processed_events'
     sink_ddl = f"""
         CREATE TABLE {table_name} (
             client_host VARCHAR,
             http_method VARCHAR,
-            url VARCHAR
+            url VARCHAR,
+            event_time TIMESTAMP(3)
         ) WITH (
             'connector' = 'jdbc',
             'url' = '{os.environ.get("POSTGRES_URL")}',
@@ -65,9 +67,9 @@ def create_processed_events_sink_postgres(t_env):
             'driver' = 'org.postgresql.Driver'
         );
     """
+    print(f"Postgres Sink DDL: \n{sink_ddl}")
     t_env.execute_sql(sink_ddl)
     return table_name
-
 
 def log_processing():
     try:
@@ -77,44 +79,34 @@ def log_processing():
         env = StreamExecutionEnvironment.get_execution_environment()
         env.enable_checkpointing(10000)
         env.set_parallelism(1)
-        print(env)
+
         settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
         t_env = StreamTableEnvironment.create(env, environment_settings=settings)
-        print(settings)
+
         # Register the UDF
         t_env.create_temporary_function("get_location", get_location)
 
-        # Create source table
+        # Create source and sink tables
         source_table = create_events_source_kafka(t_env)
-        print(source_table)
         postgres_sink = create_processed_events_sink_postgres(t_env)
-        print(postgres_sink)
-        print('loading into postgres')
+
+        # Insert data into Postgres with timestamp conversion
+        print("Inserting data into Postgres...")
         t_env.execute_sql(
             f"""
             INSERT INTO {postgres_sink}
             SELECT
                 client_host,
                 http_method,
-                url
+                url,
+                TO_TIMESTAMP(SUBSTRING(event_time, 1, 26), 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS') AS event_time
             FROM {source_table}
             """
         ).wait()
+
+        print("Flink job completed!")
     except Exception as e:
         print(f"An error occurred: {str(e)}")
-    
-
-
-    # Execute the SQL query
-
-
-    # Execute SQL to read from the source
-    result = t_env.execute_sql(f"SELECT * FROM {source_table}")
-    print("Reading events from Kafka...")
-    print(result.collect())
-
-    print("Flink job completed!")
-
 
 if __name__ == "__main__":
     log_processing()
