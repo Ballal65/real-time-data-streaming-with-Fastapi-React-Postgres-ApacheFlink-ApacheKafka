@@ -4,7 +4,9 @@ FLINK_JOB_PATH=/flink/jobs/jobs/log_job.py
 
 # Default command to run the Flink job
 run-flink-job:
-	docker exec $(JOB_MANAGER_CONTAINER) python $(FLINK_JOB_PATH)
+	docker exec $(JOB_MANAGER_CONTAINER) flink run -py $(FLINK_JOB_PATH)
+
+#	docker exec -d $(JOB_MANAGER_CONTAINER) python $(FLINK_JOB_PATH)
 
 # Helper command to check if JobManager is running
 check-jobmanager:

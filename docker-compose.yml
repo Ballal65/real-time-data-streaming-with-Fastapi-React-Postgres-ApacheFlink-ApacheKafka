@@ -12,6 +12,7 @@ services:
       - "6123"
     ports:
       - "8081:8081" # Flink Web UI
+      - "6123:6123"  # RPC port for JobManager communication
     volumes:
       - ./backend/src:/flink/jobs
     command: jobmanager
