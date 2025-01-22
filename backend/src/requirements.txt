@@ -1,3 +1,0 @@
-requests
-pyflink
-apache-flink==1.16.2

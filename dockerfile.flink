@@ -16,7 +16,7 @@ RUN apt-get update -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
-COPY ./backend/src/requirements.txt /tmp/requirements.txt
+COPY ./flink/requirements.txt /tmp/requirements.txt
 RUN python -m pip install --upgrade pip && \
     pip3 install -r /tmp/requirements.txt --no-cache-dir
 

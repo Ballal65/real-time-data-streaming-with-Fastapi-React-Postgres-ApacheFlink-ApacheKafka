@@ -28,7 +28,6 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./airflow/spark_jobs:/opt/airflow/spark_jobs
       - /home/ompathare/extracted_data:/opt/airflow/extracted_data:z
       - /home/ompathare/transformed_data:/opt/airflow/transformed_data:z
     ports:
@@ -63,7 +62,6 @@ services:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./airflow/plugins:/opt/airflow/plugins
-      - ./airflow/spark_jobs:/opt/airflow/spark_jobs
       - /home/ompathare/extracted_data:/opt/airflow/extracted_data:z
       - /home/ompathare/transformed_data:/opt/airflow/transformed_data:z
     depends_on:
@@ -93,7 +91,7 @@ services:
       - "8081:8081" # Flink Web UI
       - "6123:6123"  # RPC port for JobManager communication
     volumes:
-      - ./backend/src:/flink/jobs
+      - ./flink/jobs:/flink/jobs
     command: jobmanager
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -116,7 +114,7 @@ services:
       - jobmanager
       - postgres
     volumes:
-      - ./backend/src:/flink
+      - ./flink/jobs:/flink/jobs
     command: taskmanager
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -208,7 +206,8 @@ services:
 #FastAPI Backend
   backend:
     build: 
-      context: ./backend
+      context: .
+      dockerfile: dockerfile.backend
     image: backend
     restart: on-failure
     container_name: backend
@@ -228,7 +227,8 @@ services:
 #React frontend
   frontend:
     build: 
-      context: ./frontend
+      context: .
+      dockerfile: dockerfile.frontend
     image: frontend
     restart: on-failure
     container_name: frontend
