@@ -1,10 +1,89 @@
 services:       
+#Airflow init
+  airflow-init:
+    build:
+      context: .
+      dockerfile: dockerfile.airflow
+    container_name: airflow-init
+    image: airflow-init
+    env_file:
+      .env
+    entrypoint: ["airflow", "db", "init"]
+    depends_on:
+      - postgres
+    networks:
+      - custom_network
+    user: "${AIRFLOW_UID}:${AIRFLOW_GID}"
+
+# Airflow Webserver
+  airflow-webserver:
+    build:
+      context: .
+      dockerfile: dockerfile.airflow
+    container_name: airflow-webserver
+    image: airflow-webserver
+    env_file:
+      - .env
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/spark_jobs:/opt/airflow/spark_jobs
+      - /home/ompathare/extracted_data:/opt/airflow/extracted_data:z
+      - /home/ompathare/transformed_data:/opt/airflow/transformed_data:z
+    ports:
+      - "8080:8080"
+    depends_on:
+      - airflow-scheduler
+      - postgres
+    user: "${AIRFLOW_UID}:${AIRFLOW_GID}"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - custom_network
+    command: >
+      bash -c "
+      sleep 20 &&
+      airflow webserver"
+
+# Airflow Scheduler
+  airflow-scheduler:
+    build:
+      context: .
+      dockerfile: dockerfile.airflow
+    container_name: airflow-scheduler
+    image: airflow-scheduler
+    env_file:
+      - .env
+    user: "${AIRFLOW_UID}:${AIRFLOW_GID}"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/spark_jobs:/opt/airflow/spark_jobs
+      - /home/ompathare/extracted_data:/opt/airflow/extracted_data:z
+      - /home/ompathare/transformed_data:/opt/airflow/transformed_data:z
+    depends_on:
+      - postgres
+    networks:
+      - custom_network
+
+    command: >
+      bash -c "
+      airflow db init &&
+      airflow users create --username airflow --firstname Ballal --lastname Pathare --role Admin --email ballalpathare65@gmail.com --password airflow || true &&
+      airflow scheduler"
+
 # Flink JobManager
   jobmanager:
     build:
       context: .
       dockerfile: dockerfile.flink
     container_name: jobmanager
+    image: jobmanager
     hostname: jobmanager
     env_file:
       - .env
@@ -21,6 +100,8 @@ services:
     depends_on:
       - kafka
       - postgres
+    networks:
+      - custom_network
 
 # Flink TaskManager
   taskmanager:
@@ -39,7 +120,9 @@ services:
     command: taskmanager
     extra_hosts:
       - "host.docker.internal:host-gateway"
-        
+    networks:
+      - custom_network
+
 #Zoopkeeper for Kafka
   zookeeper:
     container_name: zookeeper
@@ -49,6 +132,8 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
     ports:
       - "2181:2181"
+    networks:
+      - custom_network
 
 #Kafka broker
   kafka:
@@ -65,6 +150,8 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "9092:9092"
+    networks:
+      - custom_network
 
 #Kafka UI
   kafdrop:
@@ -77,6 +164,8 @@ services:
       KAFKA_BROKERCONNECT: "kafka:9092"
     ports:
       - "9000:9000"
+    networks:
+      - custom_network
 
 #Postgres Database     
   postgres:
@@ -91,8 +180,15 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    networks:
+      - custom_network
 
 #pgAdmin UI for Postgres Database
   pgadmin:
@@ -106,10 +202,14 @@ services:
       - "5050:80"
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - custom_network
 
 #FastAPI Backend
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+    image: backend
     restart: on-failure
     container_name: backend
     command: ["python", "-m", "app.main", "true"]
@@ -122,10 +222,14 @@ services:
       - kafka
     env_file:
       - .env
+    networks:
+      - custom_network
 
 #React frontend
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+    image: frontend
     restart: on-failure
     container_name: frontend
     ports:
@@ -140,7 +244,16 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     command: ["npm", "start"]
+    networks:
+      - custom_network
 
 volumes:
   postgres-data:
   pgadmin-data:
+  airflow-logs:
+  airflow-dags:
+  airflow-plugins:
+
+networks:
+  custom_network:
+    driver: bridge

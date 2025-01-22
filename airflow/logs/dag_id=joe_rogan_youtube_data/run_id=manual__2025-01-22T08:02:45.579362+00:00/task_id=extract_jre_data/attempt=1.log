@@ -1,0 +1,20 @@
+[2025-01-22T08:02:50.373+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-01-22T08:02:50.395+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T08:02:45.579362+00:00 [queued]>
+[2025-01-22T08:02:50.403+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T08:02:45.579362+00:00 [queued]>
+[2025-01-22T08:02:50.403+0000] {taskinstance.py:2866} INFO - Starting attempt 1 of 5
+[2025-01-22T08:02:50.415+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): extract_jre_data> on 2025-01-22 08:02:45.579362+00:00
+[2025-01-22T08:02:50.425+0000] {standard_task_runner.py:72} INFO - Started process 43 to run task
+[2025-01-22T08:02:50.432+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'joe_rogan_youtube_data', 'extract_jre_data', 'manual__2025-01-22T08:02:45.579362+00:00', '--job-id', '17', '--raw', '--subdir', 'DAGS_FOLDER/joe_rogan_youtube_channel.py', '--cfg-path', '/tmp/tmp8m53ictz']
+[2025-01-22T08:02:50.437+0000] {standard_task_runner.py:105} INFO - Job 17: Subtask extract_jre_data
+[2025-01-22T08:02:50.511+0000] {task_command.py:467} INFO - Running <TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T08:02:45.579362+00:00 [running]> on host 1e1015206d1c
+[2025-01-22T08:02:50.618+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='Ballal' AIRFLOW_CTX_DAG_ID='joe_rogan_youtube_data' AIRFLOW_CTX_TASK_ID='extract_jre_data' AIRFLOW_CTX_EXECUTION_DATE='2025-01-22T08:02:45.579362+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-01-22T08:02:45.579362+00:00'
+[2025-01-22T08:02:50.620+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2025-01-22T08:02:50.638+0000] {__init__.py:49} INFO - file_cache is only supported with oauth2client<4.0.0
+[2025-01-22T08:03:25.129+0000] {logging_mixin.py:190} INFO - Data saved successfully to /opt/airflow/extracted_data/youtube_data/jre_data_2025-01-22.csv
+[2025-01-22T08:03:25.129+0000] {logging_mixin.py:190} INFO - Saved 3326 videos to CSV.
+[2025-01-22T08:03:25.134+0000] {python.py:240} INFO - Done. Returned value was: None
+[2025-01-22T08:03:25.151+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2025-01-22T08:03:25.151+0000] {taskinstance.py:352} INFO - Marking task as SUCCESS. dag_id=joe_rogan_youtube_data, task_id=extract_jre_data, run_id=manual__2025-01-22T08:02:45.579362+00:00, execution_date=20250122T080245, start_date=20250122T080250, end_date=20250122T080325
+[2025-01-22T08:03:25.211+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 0
+[2025-01-22T08:03:25.231+0000] {taskinstance.py:3895} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-01-22T08:03:25.234+0000] {local_task_job_runner.py:245} INFO - ::endgroup::

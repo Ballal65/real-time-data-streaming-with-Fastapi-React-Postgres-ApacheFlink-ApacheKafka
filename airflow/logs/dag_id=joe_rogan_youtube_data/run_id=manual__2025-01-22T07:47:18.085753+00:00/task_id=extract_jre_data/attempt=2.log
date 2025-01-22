@@ -1,0 +1,107 @@
+[2025-01-22T07:49:01.371+0000] {local_task_job_runner.py:123} INFO - ::group::Pre task execution logs
+[2025-01-22T07:49:01.392+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T07:47:18.085753+00:00 [queued]>
+[2025-01-22T07:49:01.400+0000] {taskinstance.py:2613} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T07:47:18.085753+00:00 [queued]>
+[2025-01-22T07:49:01.401+0000] {taskinstance.py:2866} INFO - Starting attempt 2 of 5
+[2025-01-22T07:49:01.415+0000] {taskinstance.py:2889} INFO - Executing <Task(PythonOperator): extract_jre_data> on 2025-01-22 07:47:18.085753+00:00
+[2025-01-22T07:49:01.425+0000] {standard_task_runner.py:72} INFO - Started process 69 to run task
+[2025-01-22T07:49:01.434+0000] {standard_task_runner.py:104} INFO - Running: ['airflow', 'tasks', 'run', 'joe_rogan_youtube_data', 'extract_jre_data', 'manual__2025-01-22T07:47:18.085753+00:00', '--job-id', '10', '--raw', '--subdir', 'DAGS_FOLDER/joe_rogan_youtube_channel.py', '--cfg-path', '/tmp/tmpvonp86xh']
+[2025-01-22T07:49:01.439+0000] {standard_task_runner.py:105} INFO - Job 10: Subtask extract_jre_data
+[2025-01-22T07:49:01.509+0000] {task_command.py:467} INFO - Running <TaskInstance: joe_rogan_youtube_data.extract_jre_data manual__2025-01-22T07:47:18.085753+00:00 [running]> on host a55b5599f1d6
+[2025-01-22T07:49:01.620+0000] {taskinstance.py:3132} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='Ballal' AIRFLOW_CTX_DAG_ID='joe_rogan_youtube_data' AIRFLOW_CTX_TASK_ID='extract_jre_data' AIRFLOW_CTX_EXECUTION_DATE='2025-01-22T07:47:18.085753+00:00' AIRFLOW_CTX_TRY_NUMBER='2' AIRFLOW_CTX_DAG_RUN_ID='manual__2025-01-22T07:47:18.085753+00:00'
+[2025-01-22T07:49:01.622+0000] {taskinstance.py:731} INFO - ::endgroup::
+[2025-01-22T07:49:01.644+0000] {__init__.py:49} INFO - file_cache is only supported with oauth2client<4.0.0
+[2025-01-22T07:49:35.659+0000] {taskinstance.py:3311} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 767, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 422, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 238, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 256, in execute_callable
+    return runner.run(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/joe_rogan_youtube_channel.py", line 102, in extract_jre_data
+    save_to_csv(videos)
+  File "/opt/airflow/dags/joe_rogan_youtube_channel.py", line 90, in save_to_csv
+    with open(CSV_FILE, 'w', newline='', encoding='utf-8') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/opt/airflow/extracted_data/youtube_data/jre_data_2025-01-22.csv'
+[2025-01-22T07:49:35.681+0000] {taskinstance.py:1225} INFO - Marking task as UP_FOR_RETRY. dag_id=joe_rogan_youtube_data, task_id=extract_jre_data, run_id=manual__2025-01-22T07:47:18.085753+00:00, execution_date=20250122T074718, start_date=20250122T074901, end_date=20250122T074935
+[2025-01-22T07:49:35.714+0000] {taskinstance.py:340} INFO - ::group::Post task execution logs
+[2025-01-22T07:49:35.715+0000] {standard_task_runner.py:124} ERROR - Failed to execute job 10 for task extract_jre_data ([Errno 13] Permission denied: '/opt/airflow/extracted_data/youtube_data/jre_data_2025-01-22.csv'; 69)
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/task/task_runner/standard_task_runner.py", line 117, in _start_by_fork
+    ret = args.func(args, dag=self.dag)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/cli_config.py", line 49, in command
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/cli.py", line 116, in wrapper
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 483, in task_run
+    task_return_code = _run_task_by_selected_method(args, _dag, ti)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 256, in _run_task_by_selected_method
+    return _run_raw_task(args, ti)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/cli/commands/task_command.py", line 341, in _run_raw_task
+    return ti._run_raw_task(
+           ^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/session.py", line 97, in wrapper
+    return func(*args, session=session, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3005, in _run_raw_task
+    return _run_raw_task(
+           ^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 273, in _run_raw_task
+    TaskInstance._execute_task_with_callbacks(
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3159, in _execute_task_with_callbacks
+    result = self._execute_task(context, task_orig)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 3183, in _execute_task
+    return _execute_task(self, context, task_orig)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 767, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/taskinstance.py", line 733, in _execute_callable
+    return ExecutionCallableRunner(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/models/baseoperator.py", line 422, in wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 238, in execute
+    return_value = self.execute_callable()
+                   ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/operators/python.py", line 256, in execute_callable
+    return runner.run(*self.op_args, **self.op_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/airflow/.local/lib/python3.11/site-packages/airflow/utils/operator_helpers.py", line 252, in run
+    return self.func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/airflow/dags/joe_rogan_youtube_channel.py", line 102, in extract_jre_data
+    save_to_csv(videos)
+  File "/opt/airflow/dags/joe_rogan_youtube_channel.py", line 90, in save_to_csv
+    with open(CSV_FILE, 'w', newline='', encoding='utf-8') as file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PermissionError: [Errno 13] Permission denied: '/opt/airflow/extracted_data/youtube_data/jre_data_2025-01-22.csv'
+[2025-01-22T07:49:35.736+0000] {local_task_job_runner.py:266} INFO - Task exited with return code 1
+[2025-01-22T07:49:35.760+0000] {taskinstance.py:3895} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-01-22T07:49:35.761+0000] {local_task_job_runner.py:245} INFO - ::endgroup::
