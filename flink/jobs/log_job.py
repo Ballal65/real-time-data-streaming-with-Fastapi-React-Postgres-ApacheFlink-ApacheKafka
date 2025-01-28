@@ -19,11 +19,13 @@ class GetLocation(ScalarFunction):
             return json.dumps({})
 
         data = response.json()
+        print(data)
+        print(type(data))
         country = data.get('country_code', '')
         state = data.get('region_name', '')
         city = data.get('city_name', '')
 
-        return json.dumps({'country': country, 'state': state, 'city': city})
+        return json.dumps(data)
 
 
 # Register UDF
@@ -57,7 +59,8 @@ def create_processed_events_sink_postgres(t_env):
             client_host VARCHAR,
             http_method VARCHAR,
             url VARCHAR,
-            event_time TIMESTAMP(3)
+            event_time TIMESTAMP(3),
+            geodata VARCHAR
         ) WITH (
             'connector' = 'jdbc',
             'url' = '{os.environ.get("POSTGRES_URL")}',
@@ -99,7 +102,8 @@ def log_processing():
                 client_host,
                 http_method,
                 url,
-                TO_TIMESTAMP(SUBSTRING(event_time, 1, 26), 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS') AS event_time
+                TO_TIMESTAMP(SUBSTRING(event_time, 1, 26), 'yyyy-MM-dd''T''HH:mm:ss.SSSSSS') AS event_time,
+                get_location(client_host) AS geodata
             FROM {source_table}
             """
         ).wait()

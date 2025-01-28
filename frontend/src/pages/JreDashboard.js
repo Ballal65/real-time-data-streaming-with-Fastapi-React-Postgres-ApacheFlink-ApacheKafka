@@ -153,7 +153,7 @@ export default function JreDashboard() {
                     
                      <SpecialCards category={category} selectedDate={selectedDate} />
                     <div className='row mb-3'>
-                        <div className='col-4'>
+                        <div className='col-sm-12 col-lg-4'>
                             <div className='card'>
                                 <div className='card-header'>
                                     <div className="row">
@@ -180,7 +180,7 @@ export default function JreDashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className='col-8'>
+                        <div className='col-sm-12 col-lg-8'>
                             <div className='card'>
                                 <div className='card-header'>
                                     <div className='card-title'>

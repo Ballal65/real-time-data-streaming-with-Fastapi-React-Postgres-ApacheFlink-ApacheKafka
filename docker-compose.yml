@@ -17,8 +17,17 @@ services:
     volumes:
       - ./flink/jobs:/flink/jobs
     command: jobmanager
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        rest.address: jobmanager
+        rest.port: 8081
     depends_on:
       - kafka
       - postgres
@@ -27,8 +36,11 @@ services:
 
 # Flink TaskManager
   taskmanager:
-    image: flink:1.16.0
+    build:
+      context: .
+      dockerfile: dockerfile.flink
     container_name: taskmanager
+    scale: 1
     env_file:
       - .env
     expose:
@@ -37,11 +49,14 @@ services:
     depends_on:
       - jobmanager
       - postgres
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 6 
     volumes:
       - ./flink/jobs:/flink/jobs
     command: taskmanager
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     networks:
       - containers_network
 

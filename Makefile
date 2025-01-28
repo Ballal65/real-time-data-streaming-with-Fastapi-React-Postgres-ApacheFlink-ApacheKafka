@@ -1,19 +1,5 @@
-# Variables
-JOB_MANAGER_CONTAINER=jobmanager
-FLINK_JOB_PATH=/flink/jobs/jobs/log_job.py
-
-# Default command to run the Flink job
 run-flink-job:
-	docker exec -d $(JOB_MANAGER_CONTAINER) python $(FLINK_JOB_PATH)
-	docker exec -d $(JOB_MANAGER_CONTAINER) flink run -py $(FLINK_JOB_PATH)
-	
-run-flink-job2:
-	docker exec -d $(JOB_MANAGER_CONTAINER) flink run -py $(FLINK_JOB_PATH)
-
-#	docker exec -d $(JOB_MANAGER_CONTAINER) python $(FLINK_JOB_PATH)
-# Helper command to check if JobManager is running
-check-jobmanager:
-	docker ps --filter "name=$(JOB_MANAGER_CONTAINER)"
+	docker exec -d jobmanager flink run -py /flink/jobs/log_job.py
 
 # Stop all containers
 stop:
@@ -24,5 +10,5 @@ start:
 	docker-compose up --build -d
 
 # Restart the Flink JobManager
-restart-jobmanager:
-	docker restart $(JOB_MANAGER_CONTAINER)
+restart-flink:
+	docker restart jobmanager taskmanager
