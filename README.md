@@ -10,3 +10,4 @@ This project is a fully containerized real-time data pipeline that logs user act
 - Docker Compose
 - PgAdmin
 - React (Frontend)
+  !['Project Architecture'](https://github.com/Ballal65/real-time-data-streaming-with-Fastapi-React-Postgres-ApacheFlink-ApacheKafka/blob/main/project_architecture.png)
