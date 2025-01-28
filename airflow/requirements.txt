@@ -1,6 +1,0 @@
-apache-airflow-providers-apache-spark>=2.0.0
-pyspark>=3.4.0
-apache-airflow-providers-openlineage>=1.8.0
-pandas
-nbconvert
-papermill

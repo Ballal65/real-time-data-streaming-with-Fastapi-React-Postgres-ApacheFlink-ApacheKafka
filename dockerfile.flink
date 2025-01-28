@@ -1,5 +1,5 @@
-FROM --platform=linux/amd64 flink:1.16.2
-
+# --platform=linux/amd64
+FROM flink:1.16.2
 # Install Python 3.7
 RUN apt-get update -y && \
     apt-get install -y build-essential libssl-dev zlib1g-dev libbz2-dev libffi-dev liblzma-dev wget && \

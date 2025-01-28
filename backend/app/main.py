@@ -3,7 +3,7 @@ import json
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import vendors
+from app.routers import vendors, jre
 from fastapi.requests import Request
 from confluent_kafka import Producer
 from app.database import Base, engine
@@ -30,6 +30,7 @@ app = FastAPI()
 Base.metadata.create_all(bind=engine)
 
 app.include_router(vendors.router)
+app.include_router(jre.router)
 # CORS origins
 ORIGINS = [
     "http://localhost:3000",
@@ -61,11 +62,11 @@ async def log_request_data(request: Request, call_next):
     event_time = datetime.datetime.now(ist_timezone).isoformat()
 
     # Log the request metadata
-    print(f"Client Host: {client_host}")
-    print(f"Method: {http_method}")
-    print(f"URL: {url}")
-    print(f"Headers: {headers}")
-    print(f"Event Time: {event_time}")
+    #print(f"Client Host: {client_host}")
+    #print(f"Method: {http_method}")
+    #print(f"URL: {url}")
+    #print(f"Headers: {headers}")
+    #print(f"Event Time: {event_time}")
     # Process the request and get the response
 
     event_message = {
