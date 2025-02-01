@@ -1,0 +1,36 @@
+# ---------- PostgreSQL Configuration ----------#
+POSTGRES_SCHEMA=postgres
+POSTGRES_USER=postgres
+POSTGRES_DB=postgres
+POSTGRES_PASSWORD=postgres
+POSTGRES_SERVER=postgres
+# Postgres settings for Flink
+POSTGRES_URL=jdbc:postgresql://postgres:5432/postgres
+
+# Kafka Configuration
+KAFKA_BROKER=kafka:9092
+KAFKA_TOPIC=ui-event-log
+KAFKA_GROUP=flink-group
+KAFKA_URL=kafka:9092
+
+
+# ---------- PgAdmin Configuration in dockerfiles ----------#
+PGADMIN_EMAIL=postgres@postgres.com
+PGADMIN_PASSWORD=postgres
+#PGADMIN_PORT=5050
+
+# ---------- Frontend Configuration  - It needs to know backend address for request ----------
+REACT_APP_BACKEND_API_URL=http://backend:8000
+
+#----------- https://www.ip2location.io/ API Key -----------
+IP_CODING_KEY="get your own api key"
+
+
+#------ Snowflake COnnector ----
+#For account take idenfitier.location part from the account url.
+SNOWFLAKE_USER = username
+SNOWFLAKE_PASSWORD = password
+SNOWFLAKE_ACCOUNT = account.location
+SNOWFLAKE_WAREHOUSE = COMPUTE_WH
+SNOWFLAKE_DATABASE = NIFTY
+SNOWFLAKE_SCHEMA = PUBLIC
