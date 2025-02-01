@@ -12,3 +12,6 @@ start:
 # Restart the Flink JobManager
 restart-flink:
 	docker restart jobmanager taskmanager
+
+restart-postgres:
+	docker restart postgres pgadmin

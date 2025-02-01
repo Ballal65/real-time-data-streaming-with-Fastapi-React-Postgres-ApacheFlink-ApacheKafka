@@ -1,8 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.models import Vendor as VendorModel
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import text
 from datetime import datetime, timedelta

@@ -3,7 +3,7 @@ import json
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import vendors, jre
+from app.routers import vendors, jre, nifty_dashboard #, auth
 from fastapi.requests import Request
 from confluent_kafka import Producer
 from app.database import Base, engine
@@ -31,6 +31,8 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(vendors.router)
 app.include_router(jre.router)
+app.include_router(nifty_dashboard.router)
+#app.include_router(auth.router)
 # CORS origins
 ORIGINS = [
     "http://localhost:3000",

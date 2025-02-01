@@ -40,6 +40,7 @@ services:
       context: .
       dockerfile: dockerfile.flink
     container_name: taskmanager
+    image: taskmanager
     scale: 1
     env_file:
       - .env

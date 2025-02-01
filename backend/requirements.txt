@@ -4,3 +4,9 @@ psycopg2
 confluent-kafka
 requests
 pytz
+snowflake-connector-python
+pandas
+passlib
+pyjwt
+passlib[bcrypt]
+python-jose
