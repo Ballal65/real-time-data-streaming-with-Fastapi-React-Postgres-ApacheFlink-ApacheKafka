@@ -5,3 +5,5 @@ backend/app/__pycache__/main.cpython-39.pyc
 /backend/app/__pycache__
 temp.txt
 .env
+/pgadmin
+/postgessql
