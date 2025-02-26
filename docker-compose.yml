@@ -118,13 +118,14 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    user: "1000:0"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - ./postgresql:/var/lib/postgresql/data
     networks:
       - containers_network
 
@@ -138,8 +139,9 @@ services:
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
     ports:
       - "5050:80"
+    user: "1000:0"
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - ./pgadmin:/var/lib/pgadmin
     networks:
       - containers_network
 

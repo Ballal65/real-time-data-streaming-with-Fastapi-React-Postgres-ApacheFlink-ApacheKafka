@@ -1,0 +1,34 @@
+WITH UNNESTED AS (
+	SELECT 
+		title, 
+		publish_date, 
+		jre_episode, 
+		mma_episode, 
+		toon_episode, 
+		duration_in_seconds, 
+		UNNEST(video_stats) AS video_stats
+	FROM jre_insights_table
+	WHERE extraction_date =  '2025-02-10'
+),
+UNNESTED_COLUMNS AS (
+	SELECT 
+		title, 
+		publish_date, 
+		jre_episode, 
+		mma_episode, 
+		toon_episode, 
+		duration_in_seconds, 
+		(video_stats::video_stats).*
+	FROM UNNESTED
+)
+SELECT 
+	title, 
+	view_count, 
+	duration_in_seconds, 
+	like_count, 
+	publish_date
+FROM UNNESTED_COLUMNS
+WHERE 
+	extraction_date =  '2025-02-10'
+	AND jre_episode = true AND mma_episode = false AND toon_episode = false
+ORDER BY publish_date ASC;

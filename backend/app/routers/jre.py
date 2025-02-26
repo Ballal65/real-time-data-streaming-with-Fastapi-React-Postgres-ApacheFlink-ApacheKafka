@@ -6,86 +6,18 @@ from sqlalchemy import text
 from datetime import datetime, timedelta
 router = APIRouter(tags=['JRE API'], prefix='/jre')
 
-@router.get('/dashboard-graph/{category}/{date}', status_code=status.HTTP_200_OK)
-async def get_jre_dashboard(date: str, category: str, db: Session = Depends(get_db)):
-    """
-    Fetch dashboard data based on the selected date and category.
-    """
+@router.get('/available-dates', status_code=status.HTTP_200_OK)
+async def get_available_dates(db: Session = Depends(get_db)):
     try:
-        # Define dynamic filters
-        category_filters = {
-            "All": "1=1",
-            "JRE episodes": "jre_episode = true AND mma_episode = false AND toon_episode = false",
-            "JRE episodes 5+ million views": "jre_episode = true AND mma_episode = false AND toon_episode = false AND view_count > 5000000",
-            "JRE episodes 10+ million views": "jre_episode = true AND mma_episode = false AND toon_episode = false AND view_count > 10000000",
-            "MMA episodes": "mma_episode = true AND jre_episode = false AND toon_episode = false",
-            "Toon episodes": "toon_episode = true AND jre_episode = false AND mma_episode = false",
-            "Other": "jre_episode = false AND mma_episode = false AND toon_episode = false",
-        }
-
-        category_filter = category_filters.get(category, "1=1")
-
-        # Define the SQL query with parameter placeholders
-        query = text(f"""
-        WITH UNNESTED AS (
-            SELECT 
-                title, 
-                publish_date, 
-                jre_episode, 
-                mma_episode, 
-                toon_episode, 
-                duration_in_seconds, 
-                UNNEST(video_stats) AS video_stats
-            FROM jre_insights_table
-            WHERE extraction_date = :date
-        ),
-        UNNESTED_COLUMNS AS (
-            SELECT 
-                title, 
-                publish_date, 
-                jre_episode, 
-                mma_episode, 
-                toon_episode, 
-                duration_in_seconds, 
-                (video_stats::video_stats).*
-            FROM UNNESTED
-        )
-        SELECT 
-            title, 
-            view_count, 
-            duration_in_seconds, 
-            like_count, 
-            publish_date
-        FROM UNNESTED_COLUMNS
-        WHERE 
-            extraction_date = :date
-            AND {category_filter}
-        ORDER BY publish_date ASC;
-        """)
-
-        # Execute the query with the `date` parameter
-        results = db.execute(query, {"date": date}).fetchall()
-
-        # Convert results to a JSON-serializable format
-        data = [
-            {
-                "title": row.title,
-                "publish_date": row.publish_date,
-                "views": row.view_count,
-                "likes": row.like_count,
-                "duration_in_seconds": row.duration_in_seconds
-            }
-            for row in results
-        ]
-
-        return data
-    except SQLAlchemyError as e:
-        print("Database error:", e)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Error fetching data."
-        )
+        query = text("""SELECT DISTINCT extraction_date FROM jre_insights_table ORDER by extraction_date;""")
+        results = db.execute(query).fetchall()
+        return [row.extraction_date for row in results]
+    except Exception as e:
+        return []
     
+
+  
+
 @router.get('/dashboard-static-cards/{category}/{date}', status_code=status.HTTP_200_OK)
 async def fill_static_cards(date: str, category: str, db: Session = Depends(get_db)):
     """
@@ -190,8 +122,19 @@ async def fill_special_cards(date: str, category: str, db: Session = Depends(get
     """
     try:
         # Calculate the previous day's date
-        date_object = datetime.strptime(date, "%Y-%m-%d")
-        yesterday_date = (date_object - timedelta(days=1)).strftime("%Y-%m-%d")
+        yesterday_query = text(f"""
+        SELECT DISTINCT extraction_date AS yesterday_date
+        FROM jre_insights_table
+        WHERE extraction_date < :date 
+        ORDER BY extraction_date DESC
+        LIMIT 1;
+        """)
+        
+        yesterday_date = db.execute(yesterday_query, {"date": date}).fetchone()
+        print(yesterday_date)
+        #convert yesterday_date to string
+        yesterday_date = yesterday_date[0].strftime("%Y-%m-%d")
+        #yesterday_date = (date_object - timedelta(days=1)).strftime("%Y-%m-%d")
 
         # Define category filters
         category_filters = {
@@ -273,6 +216,92 @@ async def fill_special_cards(date: str, category: str, db: Session = Depends(get
             detail="Error fetching data."
         )
 
+"""
+Router to get the dashboard chart based on category and date
+"""
+@router.get('/dashboard-graph/{category}/{date}', status_code=status.HTTP_200_OK)
+async def get_dashboard_chart(date: str, category: str, db: Session = Depends(get_db)):
+    """
+    Fetch dashboard data based on the selected date and category.
+    """
+    try:
+        # Define dynamic filters
+        category_filters = {
+            "All": "1=1",
+            "JRE episodes": "jre_episode = true AND mma_episode = false AND toon_episode = false",
+            "JRE episodes 5+ million views": "jre_episode = true AND mma_episode = false AND toon_episode = false AND view_count > 5000000",
+            "JRE episodes 10+ million views": "jre_episode = true AND mma_episode = false AND toon_episode = false AND view_count > 10000000",
+            "MMA episodes": "mma_episode = true AND jre_episode = false AND toon_episode = false",
+            "Toon episodes": "toon_episode = true AND jre_episode = false AND mma_episode = false",
+            "Other": "jre_episode = false AND mma_episode = false AND toon_episode = false",
+        }
+
+        category_filter = category_filters.get(category, "1=1")
+
+        # Define the SQL query with parameter placeholders
+        query = text(f"""
+        WITH UNNESTED AS (
+            SELECT 
+                title, 
+                publish_date, 
+                jre_episode, 
+                mma_episode, 
+                toon_episode, 
+                duration_in_seconds, 
+                UNNEST(video_stats) AS video_stats
+            FROM jre_insights_table
+            WHERE extraction_date = :date
+        ),
+        UNNESTED_COLUMNS AS (
+            SELECT 
+                title, 
+                publish_date, 
+                jre_episode, 
+                mma_episode, 
+                toon_episode, 
+                duration_in_seconds, 
+                (video_stats::video_stats).*
+            FROM UNNESTED
+        )
+        SELECT 
+            title, 
+            view_count, 
+            duration_in_seconds, 
+            like_count, 
+            publish_date
+        FROM UNNESTED_COLUMNS
+        WHERE 
+            extraction_date = :date
+            AND {category_filter}
+        ORDER BY publish_date ASC;
+        """)
+
+        # Execute the query with the `date` parameter
+        results = db.execute(query, {"date": date}).fetchall()
+
+        # Convert results to a JSON-serializable format
+        data = [
+            {
+                "title": row.title,
+                "publish_date": row.publish_date,
+                "views": row.view_count,
+                "likes": row.like_count,
+                "duration_in_seconds": row.duration_in_seconds
+            }
+            for row in results
+        ]
+
+        return data
+    except SQLAlchemyError as e:
+        print("Database error:", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error fetching data."
+        )
+  
+"""
+Router to get the col-4 top 10 card 
+"""
 @router.get('/dashboard-top-10-card/{category}/{date}/{filterType}', status_code=status.HTTP_200_OK)
 async def fill_special_cards(date: str, category: str, filterType: str, db: Session = Depends(get_db)):
     """

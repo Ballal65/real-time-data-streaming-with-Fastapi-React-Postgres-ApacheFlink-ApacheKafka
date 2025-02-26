@@ -3,58 +3,14 @@ import JREDashboardChart from '../components/JreDashboardChart';
 import VideosByCategory from '../components/StaticDashboardCards';
 import SpecialCards from '../components/SpecialCards';
 import Top10Card from '../components/Top10Card';
+import JreDateDropdown from '../components/JreDateDropdown';
+
 export default function JreDashboard() {
 
     const [dates, setDates] = useState([]);
     const [selectedDate, setSelectedDate] = useState("");
     const [category, setCategory] = useState("All");
-    const [isGraphLoading, setGraphIsLoading] = useState(false);
-    const [filterType, setFilterType] = useState('watchVideos');
-    const handleRefresh = () => {
-        setGraphIsLoading(true); // Show placeholder during refresh
-        setTimeout(() => {
-          setGraphIsLoading(false); // Stop loading
-        }, 100); // Simulate loading delay
-      
-        console.log("Refresh Triggered", {
-          isLoading: isGraphLoading,
-          category,
-          selectedDate
-        });
-      };
-      
-
-      useEffect(() => {
-        // Generate date options (from 22nd Jan to yesterday)
-        const startDate = new Date("2025-01-22");
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() - 1); // Yesterday
-        const dateOptions = [];
-    
-        while (startDate <= endDate) {
-          dateOptions.push(startDate.toISOString().split("T")[0]); // Format: YYYY-MM-DD
-          startDate.setDate(startDate.getDate() + 1);
-        }
-    
-        setDates(dateOptions);
-        setSelectedDate(dateOptions[dateOptions.length - 1]); // Default to yesterday
-      }, []);
-
-      useEffect(() => {
-        // Generate date options from 22nd Jan to yesterday
-        const startDate = new Date('2025-01-22');
-        const endDate = new Date();
-        endDate.setDate(endDate.getDate() - 1); // Yesterday
-        const dateOptions = [];
-    
-        while (startDate <= endDate) {
-          dateOptions.push(startDate.toISOString().split('T')[0]); // Format: YYYY-MM-DD
-          startDate.setDate(startDate.getDate() + 1);
-        }
-    
-        setDates(dateOptions);
-        setSelectedDate(dateOptions[dateOptions.length - 1]); // Default to yesterday
-      }, []);
+    const [filterType, setFilterType] = useState('guestNames');
 
       const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -114,17 +70,7 @@ export default function JreDashboard() {
                                         <div className='card-title mt-2'>Date</div>
                                     </div>
                                     <div className='col-auto'>
-                                    <select className="form-select" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)}>
-                                        {dates.map((date) => (
-                                            <option key={date} value={date}>
-                                            {new Date(date).toLocaleDateString("en-US", {
-                                                month: "long",
-                                                day: "numeric",
-                                                year: "numeric",
-                                            })}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        <JreDateDropdown dates={dates} setDates={setDates} selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
                                     </div>    
                                     <div className='col-auto'>
                                             <div className='card-title mt-2'>Category </div>
@@ -149,9 +95,11 @@ export default function JreDashboard() {
                     {/* First Row with insights - Videos by category */}
                     <VideosByCategory
                     category={String(category)}
-                    date={String(selectedDate)} /> 
+                    date={String(selectedDate)} />  
+
                     
-                     <SpecialCards category={category} selectedDate={selectedDate} />
+                     
+                    <SpecialCards category={category} selectedDate={selectedDate} /> 
                     <div className='row mb-3'>
                         <div className='col-sm-12 col-lg-4'>
                             <div className='card'>
@@ -176,7 +124,7 @@ export default function JreDashboard() {
                                     </div>
                                 </div>
                                 <div className='card-body'>
-                                <Top10Card category={category} date={selectedDate} filterType={filterType} />
+                                <Top10Card category={category} date={selectedDate} filterType={filterType} /> 
                                 </div>
                             </div>
                         </div>
@@ -184,25 +132,14 @@ export default function JreDashboard() {
                             <div className='card'>
                                 <div className='card-header'>
                                     <div className='card-title'>
-                                        Publish date vs {category}
+                                        Today's graph for {category && category !== "All" ? category : "all categories"} on {selectedDate}
                                     </div>
                                 </div>
                                 <div className='card-body'>
-                                {isGraphLoading ? (
-                                    <div className="placeholder-glow">
-                                    <div className="ratio ratio-21x9 card-img-top placeholder"></div>
-                                    <div className="card-body">
-                                        <div className="placeholder col-9 mb-3"></div>
-                                        <div className="placeholder placeholder-xs col-10"></div>
-                                        <div className="placeholder placeholder-xs col-11"></div>
-                                    </div>
-                                    </div>
-                                ) : (
                                     <JREDashboardChart
                                     category={String(category)}
                                     date={String(selectedDate)}
                                     />
-                                )}
                                 </div>
                             </div>
                         </div>
