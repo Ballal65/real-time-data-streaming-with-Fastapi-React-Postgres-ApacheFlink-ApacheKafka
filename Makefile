@@ -15,3 +15,6 @@ restart-flink:
 
 restart-postgres:
 	docker restart postgres pgadmin
+
+rebuild:
+	docker-compose down && docker-compose up --build -d

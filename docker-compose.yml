@@ -1,65 +1,65 @@
 services:       
 # Flink JobManager
-  jobmanager:
-    build:
-      context: .
-      dockerfile: dockerfile.flink
-    container_name: jobmanager
-    image: jobmanager
-    hostname: jobmanager
-    env_file:
-      - .env
-    expose:
-      - "6123"
-    ports:
-      - "8081:8081" # Flink Web UI
-      - "6123:6123"  # RPC port for JobManager communication
-    volumes:
-      - ./flink/jobs:/flink/jobs
-    command: jobmanager
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        rest.address: jobmanager
-        rest.port: 8081
-    depends_on:
-      - kafka
-      - postgres
-    networks:
-      - containers_network
+#   jobmanager:
+#     build:
+#       context: .
+#       dockerfile: dockerfile.flink
+#     container_name: jobmanager
+#     image: jobmanager
+#     hostname: jobmanager
+#     env_file:
+#       - .env
+#     expose:
+#       - "6123"
+#     ports:
+#       - "8081:8081" # Flink Web UI
+#       - "6123:6123"  # RPC port for JobManager communication
+#     volumes:
+#       - ./flink/jobs:/flink/jobs
+#     command: jobmanager
+#     healthcheck:
+#       test: ["CMD", "curl", "-f", "http://localhost:8081"]
+#       interval: 30s
+#       timeout: 10s
+#       retries: 3
+#     environment:
+#       - |
+#         FLINK_PROPERTIES=
+#         jobmanager.rpc.address: jobmanager
+#         rest.address: jobmanager
+#         rest.port: 8081
+#     depends_on:
+#       - kafka
+#       - postgres
+#     networks:
+#       - containers_network
 
-# Flink TaskManager
-  taskmanager:
-    build:
-      context: .
-      dockerfile: dockerfile.flink
-    container_name: taskmanager
-    image: taskmanager
-    scale: 1
-    env_file:
-      - .env
-    expose:
-      - "6121"
-      - "6122"
-    depends_on:
-      - jobmanager
-      - postgres
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 6 
-    volumes:
-      - ./flink/jobs:/flink/jobs
-    command: taskmanager
-    networks:
-      - containers_network
+# # Flink TaskManager
+#   taskmanager:
+#     build:
+#       context: .
+#       dockerfile: dockerfile.flink
+#     container_name: taskmanager
+#     image: taskmanager
+#     scale: 1
+#     env_file:
+#       - .env
+#     expose:
+#       - "6121"
+#       - "6122"
+#     depends_on:
+#       - jobmanager
+#       - postgres
+#     environment:
+#       - |
+#         FLINK_PROPERTIES=
+#         jobmanager.rpc.address: jobmanager
+#         taskmanager.numberOfTaskSlots: 6 
+#     volumes:
+#       - ./flink/jobs:/flink/jobs
+#     command: taskmanager
+#     networks:
+#       - containers_network
 
 #Zoopkeeper for Kafka
   zookeeper:
@@ -146,48 +146,48 @@ services:
       - containers_network
 
 #FastAPI Backend
-  backend:
-    build: 
-      context: .
-      dockerfile: dockerfile.backend
-    image: backend
-    restart: on-failure
-    container_name: backend
-    command: ["python", "-m", "app.main", "true"]
-    volumes:
-      - ./backend:/code
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-      - kafka
-    env_file:
-      - .env
-    networks:
-      - containers_network
+#   backend:
+#     build: 
+#       context: .
+#       dockerfile: dockerfile.backend
+#     image: backend
+#     restart: on-failure
+#     container_name: backend
+#     command: ["python", "-m", "app.main", "true"]
+#     volumes:
+#       - ./backend:/code
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - postgres
+#       - kafka
+#     env_file:
+#       - .env
+#     networks:
+#       - containers_network
 
-#React frontend
-  frontend:
-    build: 
-      context: .
-      dockerfile: dockerfile.frontend
-    image: frontend
-    restart: on-failure
-    container_name: frontend
-    ports:
-      - "3000:3000"
-    depends_on:
-      - backend
-    env_file:
-      - .env
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    command: ["npm", "start"]
-    networks:
-      - containers_network
+# #React frontend
+#   frontend:
+#     build: 
+#       context: .
+#       dockerfile: dockerfile.frontend
+#     image: frontend
+#     restart: on-failure
+#     container_name: frontend
+#     ports:
+#       - "3000:3000"
+#     depends_on:
+#       - backend
+#     env_file:
+#       - .env
+#     volumes:
+#       - ./frontend/src:/app/src
+#       - ./frontend/public:/app/public
+#     environment:
+#       - CHOKIDAR_USEPOLLING=true
+#     command: ["npm", "start"]
+#     networks:
+#       - containers_network
 
 volumes:
   postgres-data:
