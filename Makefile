@@ -3,11 +3,11 @@ run-flink-job:
 
 # Stop all containers
 stop:
-	docker-compose down
+	docker compose down
 
 # Build and start all containers
 start:
-	docker-compose up --build -d
+	docker compose up --build -d
 
 # Restart the Flink JobManager
 restart-flink:
@@ -17,4 +17,4 @@ restart-postgres:
 	docker restart postgres pgadmin
 
 rebuild:
-	docker-compose down && docker-compose up --build -d
+	docker compose down && docker-compose up --build -d
